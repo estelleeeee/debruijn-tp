@@ -24,13 +24,13 @@ random.seed(9001)
 from random import randint
 import statistics
 
-__author__ = "Your Name"
+__author__ = "Estelle Mariaux"
 __copyright__ = "Universite Paris Diderot"
-__credits__ = ["Your Name"]
+__credits__ = ["Estelle Mariaux"]
 __license__ = "GPL"
 __version__ = "1.0.0"
-__maintainer__ = "Your Name"
-__email__ = "your@email.fr"
+__maintainer__ = "Estelle Mariaux"
+__email__ = "estelle.mariaux@hotmail.fr"
 __status__ = "Developpement"
 
 def isfile(path):
