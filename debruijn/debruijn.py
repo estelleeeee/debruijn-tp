@@ -104,7 +104,7 @@ def build_graph(dict_kmer):
     """ #affichage du graphe, seulement sur petite donnée
     plt.subplot(111)
     nx.draw(G, with_labels = True)
-    plt.savefig("test_graphe")
+    plt.savefig("graphe")
     """
     return(G)
 
@@ -142,6 +142,19 @@ def get_contigs(graph,list_starting, list_sink):
                 contigs.append((contig, len(contig)))
     return(contigs)
 
+def fill(text, width = 80):
+    """Split text with a line return to respect fasta format
+    """
+    return(os.linesep.join(text[i:i+width] for i in range(0,len(text), width)))
+    
+def save_contigs(list_tuple):
+    with open("../results/contig.txt","w") as file:
+        for i in range(0,len(list_tuple)):
+            file.write(">contig_{} len={}\n".format(i+1, list_tuple[i][1]))
+            file.write("{}\n".format(fill(list_tuple[i][0], 80)))
+
+#3 Simplification du graphe de De Bruijn ----------------------
+
 
 #==============================================================
 # Main program
@@ -163,9 +176,10 @@ def main():
     # Graphe de De Bruijn
     liste_entree = get_starting_nodes(G)
     liste_sortie = get_sink_nodes(G)
-    #print(liste_entree)
-    #print(liste_sortie)
-    print(get_contigs(G, liste_entree, liste_sortie))
+    contigs = (get_contigs(G, liste_entree, liste_sortie))
+    save_contigs(contigs)
+
+    # Resolution des bulles
     
 if __name__ == '__main__':
     main()
