@@ -96,7 +96,7 @@ def build_kmer_dict(fastq_file, kmer_size):
     return(kmer_dict)
 
 def build_graph(dict_kmer):
-    """Creates graph
+    """Creates graph from dictionnary
     """
     G = nx.DiGraph()
     for kmer, poids in dict_kmer.items():
@@ -109,8 +109,39 @@ def build_graph(dict_kmer):
     return(G)
 
 #2 Parcours du graphe de De Bruijn ----------------------------
-
+def get_starting_nodes(graph):
+    """Creates list of nodes
+    """
+    noeud_entree = []
+    for node in graph:
+        if len(list(graph.predecessors(node))) == 0:
+            noeud_entree.append(node)
+    return(noeud_entree)
     
+def get_sink_nodes(graph):
+    """Creates list of nodes
+    """
+    noeud_sortie = []
+    for node in graph:
+        if len(list(graph.successors(node))) == 0:
+            noeud_sortie.append(node)
+    return(noeud_sortie)
+
+def get_contigs(graph,list_starting, list_sink):
+    """Creates list of tuple(contig, length contig)
+    """
+    contigs = []
+    for start in list_starting:
+        for sink in list_sink:
+            path = list(nx.all_simple_paths(graph, source = start, target = sink))
+            
+            if path:
+                contig = path[0][0]
+                for i in range(1, len(path[0])):
+                    contig += path[0][i][-1]
+                contigs.append((contig, len(contig)))
+    return(contigs)
+
 
 #==============================================================
 # Main program
@@ -127,8 +158,14 @@ def main():
     #print(dico_kmer)
     
     # Construction de l'arbre de De Bruijn
-    build_graph(dico_kmer)
+    G = build_graph(dico_kmer)
     
+    # Graphe de De Bruijn
+    liste_entree = get_starting_nodes(G)
+    liste_sortie = get_sink_nodes(G)
+    #print(liste_entree)
+    #print(liste_sortie)
+    print(get_contigs(G, liste_entree, liste_sortie))
     
 if __name__ == '__main__':
     main()
