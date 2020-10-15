@@ -17,7 +17,7 @@ import argparse
 import os
 import sys
 import networkx as nx
-import matplotlib
+import matplotlib.pyplot as plt
 from operator import itemgetter
 import random
 random.seed(9001)
@@ -64,6 +64,53 @@ def get_arguments():
                         help="Output contigs in fasta file")
     return parser.parse_args()
 
+#1 Creation du graphe de De Bruijn ----------------------------
+
+def read_fastq(fastq_file):
+    """ Creates a generator of sequences
+    """
+    with open(fastq_file, "r") as file:
+        for seq in file:
+            yield(next(file))
+            next(file)
+            next(file)
+
+def cut_kmer(sequence, kmer_size):
+    """Creates a generator of kmer)
+    """
+    k = 0
+    while kmer_size+k < len(sequence):
+        yield(sequence[k:kmer_size+k])
+        k+=1
+
+def build_kmer_dict(fastq_file, kmer_size):
+    """Creates dictionnary of kmer
+    """
+    kmer_dict = {}
+    for seq in read_fastq(fastq_file):
+        for kmer in cut_kmer(seq, kmer_size):
+            if kmer in kmer_dict.keys():
+                kmer_dict[kmer] += 1
+            else:
+                kmer_dict[kmer] = 1
+    return(kmer_dict)
+
+def build_graph(dict_kmer):
+    """Creates graph
+    """
+    G = nx.DiGraph()
+    for kmer, poids in dict_kmer.items():
+        G.add_edge(kmer[:-1],kmer[1:], weight = poids)
+    """ #affichage du graphe, seulement sur petite donnée
+    plt.subplot(111)
+    nx.draw(G, with_labels = True)
+    plt.savefig("test_graphe")
+    """
+    return(G)
+
+#2 Parcours du graphe de De Bruijn ----------------------------
+
+    
 
 #==============================================================
 # Main program
@@ -74,6 +121,14 @@ def main():
     """
     # Get arguments
     args = get_arguments()
-
+    
+    # Identification des k-mer unique
+    dico_kmer = build_kmer_dict(args.fastq_file, args.kmer_size)
+    #print(dico_kmer)
+    
+    # Construction de l'arbre de De Bruijn
+    build_graph(dico_kmer)
+    
+    
 if __name__ == '__main__':
     main()
