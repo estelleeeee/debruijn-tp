@@ -148,13 +148,26 @@ def fill(text, width = 80):
     return(os.linesep.join(text[i:i+width] for i in range(0,len(text), width)))
     
 def save_contigs(list_tuple):
+    """Creates a txt file for the contigs
+    """
     with open("../results/contig.txt","w") as file:
         for i in range(0,len(list_tuple)):
             file.write(">contig_{} len={}\n".format(i+1, list_tuple[i][1]))
             file.write("{}\n".format(fill(list_tuple[i][0], 80)))
 
 #3 Simplification du graphe de De Bruijn ----------------------
+def std(liste):
+    """Calculates the standard deviation of a list
+    """
+    return(statistics.stdev(liste))
 
+def path_average_weight(graph, path):
+    weight_full = 0
+    for i in range(len(path)-1):
+        weight_full += graph[path[i]][path[i+1]]["weight"]
+    return(weight_full / (len(path)-1))
+
+    
 
 #==============================================================
 # Main program
@@ -180,6 +193,8 @@ def main():
     save_contigs(contigs)
 
     # Resolution des bulles
-    
+    for path in nx.all_simple_paths(G, source = liste_entree[1], target = liste_sortie):
+        print(path_average_weight(G, path))
+ 
 if __name__ == '__main__':
     main()
